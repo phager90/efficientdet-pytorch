@@ -51,25 +51,27 @@ class PrefetchLoader:
             mean=IMAGENET_DEFAULT_MEAN,
             std=IMAGENET_DEFAULT_STD):
         self.loader = loader
-        self.mean = torch.tensor([x * 255 for x in mean]).cuda().view(1, 3, 1, 1)
-        self.std = torch.tensor([x * 255 for x in std]).cuda().view(1, 3, 1, 1)
+        self.mean = torch.tensor([x * 255 for x in mean]).view(1, 3, 1, 1)
+        self.std = torch.tensor([x * 255 for x in std]).view(1, 3, 1, 1)
 
     def __iter__(self):
-        stream = torch.cuda.Stream()
+        #stream = torch.cuda.Stream()
         first = True
 
         for next_input, next_target in self.loader:
-            with torch.cuda.stream(stream):
-                next_input = next_input.cuda(non_blocking=True)
-                next_input = next_input.float().sub_(self.mean).div_(self.std)
-                next_target = {k: v.cuda(non_blocking=True) for k, v in next_target.items()}
+            next_input = next_input.float().sub_(self.mean).div_(self.std)
+            #with torch.cuda.stream(stream):
+            #    next_input = next_input.cuda(non_blocking=True)
+            #    next_input = next_input.float().sub_(self.mean).div_(self.std)
+            #    next_target = {k: v.cuda(non_blocking=True) for k, v in next_target.items()}
+            next_target = {k: v for k, v in next_target.items()}
 
             if not first:
                 yield input, target
             else:
                 first = False
 
-            torch.cuda.current_stream().wait_stream(stream)
+            #torch.cuda.current_stream().wait_stream(stream)
             input = next_input
             target = next_target
 

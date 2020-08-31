@@ -99,7 +99,7 @@ def validate(args):
     param_count = sum([m.numel() for m in bench.parameters()])
     print('Model %s created, param count: %d' % (args.model, param_count))
 
-    bench = bench.cuda()
+    #bench = bench.cuda()
     if has_amp:
         print('Using AMP mixed precision.')
         bench = amp.initialize(bench, opt_level='O1')
@@ -134,6 +134,9 @@ def validate(args):
     end = time.time()
     with torch.no_grad():
         for i, (input, target) in enumerate(loader):
+            print(input.shape)
+            print(target['img_scale'])
+            print(target['img_size'])
             output = bench(input, target['img_scale'], target['img_size'])
             output = output.cpu()
             sample_ids = target['img_id'].cpu()

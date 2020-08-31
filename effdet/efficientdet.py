@@ -110,6 +110,9 @@ class ResampleFeatureMap(nn.Sequential):
 
         if reduction_ratio > 1:
             stride_size = int(reduction_ratio)
+            #print("XXX "+ str(int(reduction_ratio)))
+            #assert int(reduction_ratio) == 2 # HACK: making stuff static...
+            #stride_size = 2
             if conv is not None and not self.conv_after_downsample:
                 self.add_module('conv', conv)
             self.add_module(
@@ -123,6 +126,9 @@ class ResampleFeatureMap(nn.Sequential):
                 self.add_module('conv', conv)
             if reduction_ratio < 1:
                 scale = int(1 // reduction_ratio)
+                #print("YYY "+ str(int(1 // reduction_ratio)))
+                #assert int(1 // reduction_ratio) == 2 # HACK: making stuff static...
+                #scale = 2
                 self.add_module('upsample', nn.UpsamplingNearest2d(scale_factor=scale))
 
     # def forward(self, x):
@@ -159,7 +165,9 @@ class FpnCombine(nn.Module):
             else:
                 node_idx = offset - len(feature_info)
                 input_reduction = fpn_config.nodes[node_idx]['reduction']
-            reduction_ratio = target_reduction / input_reduction
+            print(input_reduction)
+            reduction_ratio = (target_reduction / input_reduction) # DETCH
+            print("ZZZ "+str(reduction_ratio))
             self.resample[str(offset)] = ResampleFeatureMap(
                 in_channels, fpn_channels, reduction_ratio=reduction_ratio, pad_type=pad_type,
                 pooling_type=pooling_type, norm_layer=norm_layer, norm_kwargs=norm_kwargs,
@@ -184,10 +192,12 @@ class FpnCombine(nn.Module):
             normalized_weights = torch.softmax(self.edge_weights.type(dtype), dim=0)
             x = torch.stack(nodes, dim=-1) * normalized_weights
         elif self.weight_method == 'fastattn':
+            print("FPN detach")
             edge_weights = nn.functional.relu(self.edge_weights.type(dtype))
             weights_sum = torch.sum(edge_weights)
+            weights_sum = weights_sum.item()
             x = torch.stack(
-                [(nodes[i] * edge_weights[i]) / (weights_sum + 0.0001) for i in range(len(nodes))], dim=-1)
+                [(nodes[i] * edge_weights[i].item()) / (weights_sum + 0.0001) for i in range(len(nodes))], dim=-1)
         elif self.weight_method == 'sum':
             x = torch.stack(nodes, dim=-1)
         else:
