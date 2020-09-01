@@ -88,6 +88,20 @@ class SeparableConv2d(nn.Module):
             x = self.act(x)
         return x
 
+# phager: FIX https://discuss.pytorch.org/t/using-nn-function-interpolate-inside-nn-sequential/23588
+class Interpolate(nn.Module):
+    def __init__(self, scale_factor, mode):
+        super(Interpolate, self).__init__()
+        self.interp = nn.functional.interpolate
+        self.scale_factor = scale_factor
+        self.mode = mode
+        
+    def forward(self, x):
+        # FIX: https://github.com/pytorch/pytorch/issues/27376 + simpler but not yet really nice...
+        # issues are actualy batch size and channel interposlation
+        x = self.interp(x, size=[int(self.scale_factor * x.shape[2]), int(self.scale_factor * x.shape[3])], mode=self.mode)
+        #x = self.interp(x, scale_factor=[int(self.scale_factor), int(self.scale_factor)], mode=self.mode)
+        return x
 
 class ResampleFeatureMap(nn.Sequential):
 
@@ -129,7 +143,9 @@ class ResampleFeatureMap(nn.Sequential):
                 #print("YYY "+ str(int(1 // reduction_ratio)))
                 #assert int(1 // reduction_ratio) == 2 # HACK: making stuff static...
                 #scale = 2
-                self.add_module('upsample', nn.UpsamplingNearest2d(scale_factor=scale))
+                # phager: FIX FOR https://github.com/pytorch/pytorch/issues/27376 -> adding interpolation module
+                # OLD: self.add_module('upsample', nn.UpsamplingNearest2d(scale_factor=scale))
+                self.add_module('upsample', Interpolate(scale_factor=scale, mode='nearest'))
 
     # def forward(self, x):
     #     #  here for debugging only
@@ -183,6 +199,7 @@ class FpnCombine(nn.Module):
     def forward(self, x):
         dtype = x[0].dtype
         nodes = []
+        sum_nodes = []
         for offset in self.inputs_offsets:
             input_node = x[offset]
             input_node = self.resample[str(offset)](input_node)
@@ -190,19 +207,24 @@ class FpnCombine(nn.Module):
 
         if self.weight_method == 'attn':
             normalized_weights = torch.softmax(self.edge_weights.type(dtype), dim=0)
-            x = torch.stack(nodes, dim=-1) * normalized_weights
+            sum_nodes = [node * normalized_weights[i] for node, i in enumerate(nodes)]
+            #x = torch.stack(nodes, dim=-1) * normalized_weights
         elif self.weight_method == 'fastattn':
             print("FPN detach")
             edge_weights = nn.functional.relu(self.edge_weights.type(dtype))
             weights_sum = torch.sum(edge_weights)
             weights_sum = weights_sum.item()
-            x = torch.stack(
-                [(nodes[i] * edge_weights[i].item()) / (weights_sum + 0.0001) for i in range(len(nodes))], dim=-1)
+            #x = torch.stack([nodes[i] * (edge_weights[i].item() / (weights_sum + 0.0001)) for i in range(len(nodes))], dim=-1)
+            sum_nodes = [nodes[i] * (edge_weights[i].item() / (weights_sum + 0.0001)) for i in range(len(nodes))]
         elif self.weight_method == 'sum':
-            x = torch.stack(nodes, dim=-1)
+            sum_nodes = nodes
+            #x = torch.stack(nodes, dim=-1)
         else:
             raise ValueError('unknown weight_method {}'.format(self.weight_method))
-        x = torch.sum(x, dim=-1)
+        #x = torch.sum(x, dim=-1)
+        x = sum_nodes[0]
+        for i in range(1,len(sum_nodes)):
+            x += sum_nodes[i]
         return x
 
 

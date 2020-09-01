@@ -204,6 +204,17 @@ efficientdet_model_param_dict = dict(
         backbone_args=dict(drop_path_rate=0.2),
         url='https://github.com/rwightman/efficientdet-pytorch/releases/download/v0.1/tf_efficientdet_d0-d92fd44f.pth',
     ),
+    tf_efficientdet_d0_phager=dict(
+        name='tf_efficientdet_d0',
+        backbone_name='efficientnet_b0', # HACK
+        image_size=512,
+        fpn_channels=64,
+        fpn_cell_repeats=3,
+        box_class_repeats=3,
+        backbone_args=dict(drop_path_rate=0.2),
+        pad_type='', # HACK do not mimick TF padding
+        url='https://github.com/rwightman/efficientdet-pytorch/releases/download/v0.1/tf_efficientdet_d0-d92fd44f.pth',
+    ),
     tf_efficientdet_d1=dict(
         name='tf_efficientdet_d1',
         backbone_name='tf_efficientnet_b1',
@@ -211,6 +222,17 @@ efficientdet_model_param_dict = dict(
         fpn_channels=88,
         fpn_cell_repeats=4,
         box_class_repeats=3,
+        backbone_args=dict(drop_path_rate=0.2),
+        url='https://github.com/rwightman/efficientdet-pytorch/releases/download/v0.1/tf_efficientdet_d1-4c7ebaf2.pth'
+    ),
+    tf_efficientdet_d1_phager=dict(
+        name='tf_efficientdet_d1',
+        backbone_name='efficientnet_b1', # HACK
+        image_size=640,
+        fpn_channels=88,
+        fpn_cell_repeats=4,
+        box_class_repeats=3,
+        pad_type='', # HACK do not mimick TF padding
         backbone_args=dict(drop_path_rate=0.2),
         url='https://github.com/rwightman/efficientdet-pytorch/releases/download/v0.1/tf_efficientdet_d1-4c7ebaf2.pth'
     ),
@@ -224,6 +246,17 @@ efficientdet_model_param_dict = dict(
         backbone_args=dict(drop_path_rate=0.2),
         url='https://github.com/rwightman/efficientdet-pytorch/releases/download/v0.1/tf_efficientdet_d2-cb4ce77d.pth',
     ),
+    tf_efficientdet_d2_phager=dict(
+        name='tf_efficientdet_d2',
+        backbone_name='efficientnet_b2', # HACK
+        image_size=768,
+        fpn_channels=112,
+        fpn_cell_repeats=5,
+        box_class_repeats=3,
+        pad_type='', # HACK do not mimick TF padding
+        backbone_args=dict(drop_path_rate=0.2),
+        url='https://github.com/rwightman/efficientdet-pytorch/releases/download/v0.1/tf_efficientdet_d2-cb4ce77d.pth',
+    ),
     tf_efficientdet_d3=dict(
         name='tf_efficientdet_d3',
         backbone_name='tf_efficientnet_b3',
@@ -231,6 +264,17 @@ efficientdet_model_param_dict = dict(
         fpn_channels=160,
         fpn_cell_repeats=6,
         box_class_repeats=4,
+        backbone_args=dict(drop_path_rate=0.2),
+        url='https://github.com/rwightman/efficientdet-pytorch/releases/download/v0.1/tf_efficientdet_d3_47-0b525f35.pth',
+    ),
+    tf_efficientdet_d3_phager=dict(
+        name='tf_efficientdet_d3',
+        backbone_name='efficientnet_b3', # HACK
+        image_size=896,
+        fpn_channels=160,
+        fpn_cell_repeats=6,
+        box_class_repeats=4,
+        pad_type='', # HACK do not mimick TF padding
         backbone_args=dict(drop_path_rate=0.2),
         url='https://github.com/rwightman/efficientdet-pytorch/releases/download/v0.1/tf_efficientdet_d3_47-0b525f35.pth',
     ),
@@ -244,6 +288,17 @@ efficientdet_model_param_dict = dict(
         backbone_args=dict(drop_path_rate=0.2),
         url='https://github.com/rwightman/efficientdet-pytorch/releases/download/v0.1/tf_efficientdet_d4-5b370b7a.pth',
     ),
+    tf_efficientdet_d4_phager=dict(
+        name='tf_efficientdet_d4',
+        backbone_name='efficientnet_b4', #HACK
+        image_size=1024,
+        fpn_channels=224,
+        fpn_cell_repeats=7,
+        box_class_repeats=4,
+        pad_type='', # HACK do not mimick TF padding
+        backbone_args=dict(drop_path_rate=0.2),
+        url='https://github.com/rwightman/efficientdet-pytorch/releases/download/v0.1/tf_efficientdet_d4-5b370b7a.pth',
+    ),
     tf_efficientdet_d5=dict(
         name='tf_efficientdet_d5',
         backbone_name='tf_efficientnet_b5',
@@ -254,6 +309,17 @@ efficientdet_model_param_dict = dict(
         backbone_args=dict(drop_path_rate=0.2),
         url='https://github.com/rwightman/efficientdet-pytorch/releases/download/v0.1/tf_efficientdet_d5-ef44aea8.pth',
     ),
+    tf_efficientdet_d5_phager=dict(
+        name='tf_efficientdet_d5',
+        backbone_name='efficientnet_b5', #HACK
+        image_size=1280,
+        fpn_channels=288,
+        fpn_cell_repeats=7,
+        box_class_repeats=4,
+        pad_type='', # HACK do not mimick TF padding
+        backbone_args=dict(drop_path_rate=0.2),
+        url='https://github.com/rwightman/efficientdet-pytorch/releases/download/v0.1/tf_efficientdet_d5-ef44aea8.pth',
+    ),
     tf_efficientdet_d6=dict(
         name='tf_efficientdet_d6',
         backbone_name='tf_efficientnet_b6',
@@ -261,6 +327,18 @@ efficientdet_model_param_dict = dict(
         fpn_channels=384,
         fpn_cell_repeats=8,
         box_class_repeats=5,
+        fpn_name='bifpn_sum',  # Use unweighted sum for training stability.
+        backbone_args=dict(drop_path_rate=0.2),
+        url='https://github.com/rwightman/efficientdet-pytorch/releases/download/v0.1/tf_efficientdet_d6-51cb0132.pth'
+    ),
+    tf_efficientdet_d6_phager=dict(
+        name='tf_efficientdet_d6',
+        backbone_name='efficientnet_b6', #HACK
+        image_size=1280,
+        fpn_channels=384,
+        fpn_cell_repeats=8,
+        box_class_repeats=5,
+        pad_type='', # HACK do not mimick TF padding
         fpn_name='bifpn_sum',  # Use unweighted sum for training stability.
         backbone_args=dict(drop_path_rate=0.2),
         url='https://github.com/rwightman/efficientdet-pytorch/releases/download/v0.1/tf_efficientdet_d6-51cb0132.pth'
@@ -308,7 +386,7 @@ efficientdet_model_param_dict = dict(
     ),
     tf_efficientdet_lite0_phager=dict( # HACK VERSION
         name='efficientdet_lite0',
-        backbone_name='efficientnet_lite0',
+        backbone_name='efficientnet_lite0', # HACK
         image_size=512,
         fpn_channels=64,
         fpn_cell_repeats=3,
@@ -316,7 +394,7 @@ efficientdet_model_param_dict = dict(
         act_type='relu',
         redundant_bias=False,
         backbone_args=dict(drop_path_rate=0.1),
-        pad_type='',
+        pad_type='',  # do not mimick TF padding
         # unlike other tf_ models, this was not ported from tf automl impl, but trained from tf pretrained efficient lite
         # weights using this code, will likely replace if/when official det-lite weights are released
         url='https://github.com/rwightman/efficientdet-pytorch/releases/download/v0.1/tf_efficientdet_lite0-f5f303a9.pth',
